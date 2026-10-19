@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Únete a un grupo · SurvivalBet</title>
+<style>
+  :root { color-scheme: dark light; --bg: #0A0D12; --text: #F2F4F7; --muted: #A9B1BF; --accent: #C6FF3D; --ink: #19231E; --card: #151B24; }
+  @media (prefers-color-scheme: light) { :root { --bg: #FFFFFF; --text: #0A0D12; --muted: #4B5563; --accent: #3F6B00; --ink: #FFFFFF; --card: #F3F4F6; } }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  main { max-width: 480px; margin: 0 auto; padding: 32px 20px 64px; text-align: center; }
+  header img { width: 220px; max-width: 70%; height: auto; margin-bottom: 8px; }
+  h1 { font-size: 26px; margin: 20px 0 8px; }
+  p { color: var(--muted); margin: 8px 0; }
+  .code { display: inline-block; margin: 16px 0 4px; padding: 12px 22px; border-radius: 12px; background: var(--card); color: var(--text); font: 700 26px/1.2 ui-monospace, "SF Mono", Menlo, Consolas, monospace; letter-spacing: 4px; }
+  .btn { display: block; margin: 14px auto 0; padding: 15px 20px; max-width: 320px; border-radius: 12px; background: var(--accent); color: var(--ink); font-weight: 700; text-decoration: none; border: 0; font-size: 16px; width: 100%; cursor: pointer; }
+  .btn.alt { background: transparent; color: var(--text); border: 2px solid var(--muted); }
+  .small { font-size: 13px; }
+  [hidden] { display: none; }
+</style>
+</head>
+<body>
+<main>
+<header><picture><source srcset="logo-claro.png" media="(prefers-color-scheme: light)"><img src="logo-oscuro.png" alt="SurvivalBet" width="220"></picture></header>
+
+<div id="con-codigo" hidden>
+<h1>Te han invitado a un grupo</h1>
+<p>Este es el código de invitación:</p>
+<div class="code" id="codigo"></div>
+<a class="btn" id="abrir" href="#">Abrir en SurvivalBet</a>
+<button class="btn alt" id="copiar" type="button">Copiar código</button>
+<a class="btn alt" id="descargar" href="https://play.google.com/store/apps/details?id=com.survivalbetapp.android">Descargar SurvivalBet</a>
+<p class="small">Si ya tienes la app, pulsa «Abrir en SurvivalBet». Si no, descárgala, entra en «Tengo un código» y escribe este código.</p>
+</div>
+
+<div id="sin-codigo" hidden>
+<h1>SurvivalBet</h1>
+<p>Este enlace no lleva ningún código de invitación. Pide a quien creó el grupo que te lo vuelva a enviar.</p>
+</div>
+
+<p class="small"><a href="privacidad.html">Política de privacidad</a> · <a href="condiciones.html">Condiciones de uso</a></p>
+</main>
+<script>
+(function () {
+  var params = new URLSearchParams(location.search);
+  var code = (params.get('codigo') || '').replace(/[^a-zA-Z0-9]/g, '').slice(0, 20);
+  if (!code) { document.getElementById('sin-codigo').hidden = false; return; }
+  document.getElementById('con-codigo').hidden = false;
+  document.getElementById('codigo').textContent = code;
+
+  var play = 'https://play.google.com/store/apps/details?id=com.survivalbetapp.android';
+  var app = 'survivalbet://groups/join?code=' + code;
+  var isAndroid = /android/i.test(navigator.userAgent);
+  // En Android, el enlace «intent» abre la app y, si no está instalada, lleva a Google Play
+  var link = isAndroid
+    ? 'intent://groups/join?code=' + code + '#Intent;scheme=survivalbet;package=com.survivalbetapp.android;S.browser_fallback_url=' + encodeURIComponent(play) + ';end'
+    : app;
+  document.getElementById('abrir').href = link;
+
+  document.getElementById('copiar').addEventListener('click', function () {
+    var btn = this;
+    var done = function () { btn.textContent = 'Código copiado'; };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(code).then(done, function () {});
+    else done();
+  });
+
+  // Intenta abrir la app directamente al entrar (si el navegador lo permite)
+  if (isAndroid) setTimeout(function () { location.href = link; }, 400);
+})();
+</script>
+</body>
+</html>
